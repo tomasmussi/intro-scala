@@ -1,6 +1,6 @@
 package exercises.week02
 
-class Rational(x: Int, y: Int) {
+class ImprovedRational(x: Int, y: Int) {
   require(y != 0, "Denominator must be nonzero")
 
   def this(x: Int) = this(x, 1)
@@ -9,25 +9,25 @@ class Rational(x: Int, y: Int) {
    **/
   private def gcd(a: Int, b: Int): Int = if (b == 0) a else gcd(b, a % b)
 
-  def numer = x
+  val numer = x
 
-  // Equivalent definition, as it is a val, gcd is called only once
   val denom = y
 
-  def less(that: Rational) = numer * that.denom < that.numer * denom
+  def <(that: ImprovedRational) = numer * that.denom < that.numer * denom
 
-  def max(that: Rational) = if (this.less(that)) that else this
+  def max(that: ImprovedRational) = if (this < that) that else this
 
-  def add(that: Rational) = new Rational(
+  def +(that: ImprovedRational) = new ImprovedRational(
     numer * that.denom + that.numer * denom ,
     denom * that.denom
   )
 
-  def neg: Rational = new Rational(-numer, denom)
+  // def neg: ImprovedRational = new ImprovedRational(-numer, denom)
+  def unary_- = new ImprovedRational(-numer, denom)
 
   // println("As the constructor executes the whole block, this should print each time a Rational is created")
 
-  def sub(that: Rational) = add(that.neg)
+  def -(that: ImprovedRational) = this + -that
 
   override def toString: String = {
     val g = gcd(numer, denom)
