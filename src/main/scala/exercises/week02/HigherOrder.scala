@@ -48,7 +48,7 @@ object HigherOrder {
   }
 
 
-  def main(args: Array[String]) {
+  def main(args: Array[String]): Unit = {
     println(sum(x => x, 1, 4))
     println(sum(x => x * x, 1, 4))
 
