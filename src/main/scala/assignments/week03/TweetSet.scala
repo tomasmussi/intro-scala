@@ -69,6 +69,8 @@ abstract class TweetSet extends TweetSetInterface {
    */
   def mostRetweeted: Tweet = ???
 
+  def mostRetweetedAcc(acc: Tweet): Tweet = ???
+
   /**
    * Returns a list containing all tweets of this set, sorted by retweet count
    * in descending order. In other words, the head of the resulting list should
@@ -110,12 +112,13 @@ abstract class TweetSet extends TweetSetInterface {
 
 class Empty extends TweetSet {
 
-
   def filterAcc(p: Tweet => Boolean, acc: TweetSet): TweetSet = acc
 
   override def union(that: TweetSet): TweetSet = that
 
   override def mostRetweeted: Tweet = throw new NoSuchElementException
+
+  override def mostRetweetedAcc(acc: Tweet): Tweet = acc
 
   override def descendingByRetweet: TweetList = Nil
 
@@ -143,32 +146,18 @@ class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet {
 
   override def union(that: TweetSet): TweetSet = {
     // this.left.union(that).union(this.right).incl(this.elem)
-    that.filterAcc(tw => true, this.filterAcc(tw => true, new Empty))
+    // that.filterAcc(tw => true, this.filterAcc(tw => true, new Empty))
+    this.left.union(this.right.union(that)).incl(elem)
   }
 
-  override def mostRetweeted: Tweet = {
-    def findMax(ts: TweetSet): Tweet = {
-      try {
-        ts.mostRetweeted
-      }catch {
-        case x: NoSuchElementException => {
-          new Tweet("", "", -1)
-        }
-      }
-    }
-    if (this.elem.retweets > findMax(this.left).retweets) {
-      if (this.elem.retweets > findMax(right).retweets) this.elem else right.mostRetweeted
-    } else {
-      if (findMax(this.left).retweets > findMax(right).retweets) findMax(this.left)
-      else findMax(this.right)
-    }
+  override def mostRetweeted: Tweet = mostRetweetedAcc(elem)
+
+  override def mostRetweetedAcc(acc: Tweet): Tweet = {
+    left.mostRetweetedAcc(right.mostRetweetedAcc(if (acc.retweets > elem.retweets) acc else elem))
   }
 
   override def descendingByRetweet: TweetList = {
-    val tw = this.mostRetweeted
-    println(tw)
-    val l = this.remove(tw).descendingByRetweet
-    new Cons(tw, l)
+    new Cons(mostRetweeted, remove(mostRetweeted).descendingByRetweet)
   }
 
   /**
