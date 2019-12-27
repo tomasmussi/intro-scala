@@ -116,7 +116,12 @@ object Anagrams extends AnagramsInterface {
         } yield (ch, n) :: comb)
       }
     }
-
+     */
+    // Another way
+    /*
+    (occurrences foldRight List[Occurrences](Nil)) { case ((ch,tm), acc) => {
+      acc ++ ( for { comb <- acc; n <- 1 to tm } yield (ch, n) :: comb )
+    } }
      */
   }
 
